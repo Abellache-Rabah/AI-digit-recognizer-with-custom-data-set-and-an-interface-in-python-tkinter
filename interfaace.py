@@ -5,7 +5,7 @@ from PIL import ImageTk
 import PIL.Image as PILImage
 import numpy as np
 import io
-import os
+import cv2
 import numpy as np
 import tensorflow as tf
 import json
@@ -16,10 +16,12 @@ from tkinter import messagebox
 
 
 model = tf.keras.models.load_model('digit_recognizer_tf')
-# Load dataset 
+
+
 with open('data.json') as f:
     dataset = json.load(f)
-# Extract training vectors
+
+
 train_vectors = np.array([sample['vector'] for sample in dataset])
 train_labels = np.array([sample['label'] for sample in dataset])
 
@@ -33,6 +35,9 @@ def draw(event):
         canvas.create_line(prev_x, prev_y, x, y, fill="black", width=6)
     prev_x, prev_y = x, y
 
+def reset_coordinates(event):
+    global prev_x, prev_y
+    prev_x, prev_y = None, None
 
 def canvas_to_image(canvas):
     img = Image.open(io.BytesIO(canvas.postscript(colormode='color').encode('utf-8')))
@@ -50,8 +55,6 @@ def predect() :
     
     img_data = np.array(img)
     removed_white = remove_white_rows_and_columns(img_data)
-
-
     img_resized = removed_white.resize((50, 50), PILImage.LANCZOS) 
     
     imageMatrix = np.array(img_resized)  # Convert to numpy array here
@@ -65,19 +68,18 @@ def predect() :
     print(index)
     print("acc :" , predictions[0][index])
 
-
-    # Compute distance to all training vectors
+    #compare
     distances = cdist([imageSubMatrix], train_vectors)[0]
 
-    # Find index of nearest neighbor 
+#index 
     nearest_idx = np.argmin(distances)
 
-    # Look up label 
     nearest_label = train_labels[nearest_idx] 
     print("Nearest match label:", nearest_label)
     messagebox.showinfo("Prediction", "The prediction is " + str(index) + " with accuracy " + str(predictions[0][index]) + "\n The Nearist Vector of futuers is : {}".format(nearest_label))
 
-
+def multiple_number():
+    print("multiple_number")
 
 
 def remove_white_rows_and_columns(image_array):
@@ -118,23 +120,43 @@ def clear():
     global prev_y 
     prev_x = None
     prev_y = None
-    canvas.config(width=500, height=500, bg="white")
+    canvas.config(width=400, height=400, bg="white", bd=2, relief="solid")
 
 
 root = tk.Tk() 
+# Set the window size
+window_width = 500
+window_height = 620
+root.geometry(f"{window_width}x{window_height}")
 
-canvas = tk.Canvas(root, width=500, height=500, bg="white") 
-canvas.pack(expand=True, fill="both") 
+# Calculate the position to center the window
+position_top = int(root.winfo_screenheight() / 2 - window_height / 2)
+position_right = int(root.winfo_screenwidth() / 2 - window_width / 2)
+
+# Position the window
+root.geometry(f"+{position_right}+{position_top}")
+
+
+canvas = tk.Canvas(root, width=400, height=400, bg="white", bd=2, relief="solid")
+canvas.pack(anchor='center',pady=5)
 
 canvas.bind("<B1-Motion>", draw) 
+canvas.bind("<ButtonRelease-1>", reset_coordinates)
 
 
-buttonClear = tk.Button(root, text="Predect", command=predect)
-buttonClear.pack()
 
-buttonClear = tk.Button(root, text="Clear", command=clear)
-buttonClear.pack()
+buttonClear = tk.Button(root, text="Predect", command=predect , width=40,height=2 , bg="green", fg="white")
+buttonClear.pack(pady=5)
 
+buttonPredet = tk.Button(root, text="Predect Multiple Numbers", command=multiple_number , width=40,height=2 , bg="blue", fg="white")
+buttonPredet.pack(pady=5)
+
+buttonClear = tk.Button(root, text="Clear", command=clear ,width=40,height=2 , bg="#333", fg="white" )
+buttonClear.pack(pady=5)
+
+
+back_button = tk.Button(root, text="Back", command=root.destroy, bg="red",height=2, fg="white", width=40)
+back_button.pack(pady=5)
 
 
 

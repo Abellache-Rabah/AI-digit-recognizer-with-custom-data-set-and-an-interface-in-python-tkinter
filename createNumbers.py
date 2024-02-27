@@ -15,6 +15,14 @@ def draw(event):
         canvas.create_line(prev_x, prev_y, x, y, fill="black", width=6)
     prev_x, prev_y = x, y
 
+def reset_coordinates(event):
+    global prev_x, prev_y
+    prev_x, prev_y = None, None
+    
+def reset_prev_coordinates(event):
+    global prev_x, prev_y
+    prev_x, prev_y = None, None
+
 
 def canvas_to_image(canvas):
     img = Image.open(io.BytesIO(canvas.postscript(colormode='color').encode('utf-8')))
@@ -44,7 +52,6 @@ def remove_white_rows_and_columns(image_array):
             if image_array[x][y] < 255:
                 i.append([x,y])
     
-
     max_x = max(i, key=lambda x: x[0])[0]
     max_y = max(i, key=lambda x: x[1])[1]
     min_x = min(i, key=lambda x: x[0])[0]
@@ -72,7 +79,7 @@ def SavePic():
     if(name == "test"):
         parent_folder = os.path.dirname(os.getcwd())
         print(parent_folder)
-        img_resized.save(os.path.join(parent_folder , "test.bmp"), 'bmp')
+        img_resized.save(os.path.join(parent_folder + "\\trained\\", "test.bmp"), 'bmp')
 
     else:
         parent_folder = os.path.dirname(os.getcwd())
@@ -88,26 +95,41 @@ def clear():
     global prev_y 
     prev_x = None
     prev_y = None
-    canvas.config(width=500, height=500, bg="white")
-
+    canvas.config(width=400, height=400, bg="white", bd=2, relief="solid")
 
 root = tk.Tk() 
 
-canvas = tk.Canvas(root, width=500, height=500, bg="white") 
-canvas.pack(expand=True, fill="both") 
+# Set the window size
+window_width = 500
+window_height = 600
+root.geometry(f"{window_width}x{window_height}")
+
+# Calculate the position to center the window
+position_top = int(root.winfo_screenheight() / 2 - window_height / 2)
+position_right = int(root.winfo_screenwidth() / 2 - window_width / 2)
+
+# Position the window
+root.geometry(f"+{position_right}+{position_top}")
+
+canvas = tk.Canvas(root, width=400, height=400, bg="white", bd=2, relief="solid")
+canvas.pack(anchor='center',pady=5)
 
 canvas.bind("<B1-Motion>", draw) 
 
-e = tk.Button(root, text="Remove White Space", command=elimini)
-e.pack()
+canvas.bind("<ButtonRelease-1>", reset_coordinates)
 
-inputtxt = tk.Entry(root) 
-inputtxt.pack() 
-sava = tk.Button(root, text="Save Picture with 50x50", command=SavePic)
-sava.pack()
+inputtxt = tk.Entry(root, width=50) 
+inputtxt.pack(pady=5) 
 
-buttonClear = tk.Button(root, text="Clear", command=clear)
-buttonClear.pack()
+sava = tk.Button(root, text="Save Picture with 50x50", command=SavePic, width=40,height=2 , bg="green", fg="white")
+sava.pack(pady=5)
 
+buttonClear = tk.Button(root, text="Clear", command=clear, width=40 ,height=2, bg="#333" , fg="white")
+buttonClear.pack(pady=5)
+
+back_button = tk.Button(root, text="Back", command=root.destroy, bg="red",height=2, fg="white", width=40)
+back_button.pack(pady=5)
+
+root.mainloop()
 
 root.mainloop()

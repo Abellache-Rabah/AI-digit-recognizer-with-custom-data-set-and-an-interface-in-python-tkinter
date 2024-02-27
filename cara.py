@@ -22,17 +22,14 @@ labels = []
 
 
 dir_path = './digit'
-prefixes = ['0', '1', "2", '3', '4', '5', '6', '7', '8', '9' ]
+prefixes = ['test0', 'test1', "test2", 'test3', 'test4', 'test5', 'test6', 'test7', 'test8', 'test9' ]
 
-# for filename in os.listdir(dir_path):
-#    for prefix in prefixes:
-#        if fnmatch.fnmatch(filename, prefix + '*'):
-#             images.append(load_image("./digit/" + filename))
-#             labels.append(prefix)
+for filename in os.listdir(dir_path):
+   for prefix in prefixes:
+       if fnmatch.fnmatch(filename, prefix + '*'):
+            images.append(load_image("./digit/" + filename))
+            labels.append(prefix[4])
     
-
-images.append(load_image("./digit/zero.bmp"))
-labels.append(9)
 
 
 
@@ -90,14 +87,14 @@ print(labels)
 
 
 
-# data = []
+data = []
 
-# for i in range(len(labels)):
-#     data.append({
-#         "label": int(labels[i]),
-#         "vector": [int(x) for x in counts[i]]
-#     })
+for i in range(len(labels)):
+    data.append({
+        "label": int(labels[i]),
+        "vector": [int(x) for x in counts[i]]
+    })
 
 
-# with open('./data.json', 'w') as f:
-#     json.dump(data, f)
+with open('./testdata.json', 'w') as f:
+    json.dump(data, f)

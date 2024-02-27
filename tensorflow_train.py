@@ -3,23 +3,42 @@ import numpy as np
 import json
 from sklearn.model_selection import train_test_split
 
-# Load the data
 with open('data.json') as f:
     dataset = json.load(f)
+  
+with open('testdata.json') as f:
+    testdataset = json.load(f)
 
-X = np.array([sample['vector'] for sample in dataset])
-y = np.array([sample['label'] for sample in dataset])
+for sample in dataset:
+   sample['vector'] = [e / 100 for e in sample['vector']]
 
-# Split the data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+for sample in testdataset:
+   sample['vector'] = [e / 100 for e in sample['vector']]
 
-# Build model
+# Create the training and testing sets
+X_train = np.array([sample['vector'] for sample in dataset])
+y_train = np.array([sample['label'] for sample in dataset])
+
+X_test = np.array([sample['vector'] for sample in testdataset])
+y_test = np.array([sample['label'] for sample in testdataset])
+
+print(X_train)
+
+
+
+
+
+
+
 model = tf.keras.models.Sequential([
-  tf.keras.layers.Dense(64, activation='relu', input_shape=(25,)),
-  tf.keras.layers.Dense(50, activation='relu'),
-  tf.keras.layers.Dense(50, activation='sigmoid'),
+    
+
+  tf.keras.layers.Dense(128, activation='relu', input_shape=(25,)),
+  tf.keras.layers.Dense(200, activation='sigmoid'),
+
 
   tf.keras.layers.Dense(10, activation='softmax')
+  
 ])
 
 # Compile & train
@@ -29,9 +48,8 @@ model.compile(
   metrics=['accuracy']
 )
 
-model.fit(X_train, y_train, epochs=100)
+model.fit(X_train, y_train, epochs=250)
 
-# Evaluate
-print("Test accuracy:", model.evaluate(X_test, y_test)[1])
+print("Test accuracy : ", model.evaluate(X_test, y_test)[1])
 
 model.save('digit_recognizer_tf')
