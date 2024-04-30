@@ -8,7 +8,7 @@ with open('data.json') as f:
 train_vectors = np.array([sample['vector'] for sample in dataset])
 train_labels = np.array([sample['label'] for sample in dataset])
 
-new_vector = [0, 25, 36, 22, 38, 25, 10, 0, 0, 30, 27, 0, 0, 0, 31, 21, 0, 0, 21, 11, 35, 21, 30, 16, 0]
+new_vector = [0, 0, 28, 34, 0, 0, 0, 22, 41, 5, 0, 0, 1, 31, 5, 22, 9, 31, 4, 6, 36, 48, 31, 25, 22]
 
 distances = cdist([new_vector], train_vectors)[0]
 

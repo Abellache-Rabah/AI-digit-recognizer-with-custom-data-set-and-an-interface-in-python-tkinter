@@ -9,7 +9,9 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import json
-from scipy.spatial.distance import cdist  
+from scipy.spatial.distance import cdist 
+from PIL import ImageGrab
+
 
 from tkinter import messagebox
 
@@ -78,8 +80,28 @@ def predect() :
     print("Nearest match label:", nearest_label)
     messagebox.showinfo("Prediction", "The prediction is " + str(index) + " with accuracy " + str(predictions[0][index]) + "\n The Nearist Vector of futuers is : {}".format(nearest_label))
 
-def multiple_number():
-    print("multiple_number")
+def multiple_number(canvas):
+    x,y,width,height = canvas.bbox("all")  # replace your_canvas with your actual canvas name
+    image = ImageGrab.grab((x, y, x + width, y + height))
+
+    # Convert the image to a numpy array and then to grayscale
+    image_np = np.array(image)
+    gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
+
+    # Apply thresholding
+    _, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY_INV)
+
+    # Find contours in the image
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # For each contour, calculate the bounding rectangle and draw it on the image
+    for contour in contours:
+        x, y, w, h = cv2.boundingRect(contour)
+        cv2.rectangle(image_np, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+    # Convert the numpy array image back to PIL image and show it
+    image = Image.fromarray(image_np)
+    image.show()
 
 
 def remove_white_rows_and_columns(image_array):
