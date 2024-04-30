@@ -29,23 +29,31 @@ y_test = np.array([sample['label'] for sample in testdataset])
 
 
 model = tf.keras.Sequential([
-    tf.keras.layers.Dense(256, activation='relu', input_shape=(25,)),
+    tf.keras.layers.Dense(512, activation='relu', input_shape=(25,)),
+    tf.keras.layers.Dropout(0.2),
+
+    
+
+    tf.keras.layers.Dense(64, activation='relu'),
     tf.keras.layers.Dropout(0.2),
    
     tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dropout(0.3),
     
+    tf.keras.layers.Dense(188, activation='sigmoid'),
+    tf.keras.layers.Dropout(0.3),
+
+
     tf.keras.layers.Dense(64, activation='relu'),
     tf.keras.layers.Dropout(0.2),
     
     tf.keras.layers.Dense(10, activation='softmax')
 ])
-
-optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
-
+# Compile & train
+optimizer = tf.keras.optimizers.Adam(amsgrad=True)
 model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-model.fit(X_train, y_train, epochs=500)
+model.fit(X_train, y_train, epochs=250)
 
 print("Test accuracy : ", model.evaluate(X_test, y_test)[1])
 
